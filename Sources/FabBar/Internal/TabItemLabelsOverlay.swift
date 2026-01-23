@@ -20,6 +20,7 @@ final class TabItemLabelsOverlay<Tab: Hashable>: UIView {
         super.init(frame: .zero)
 
         isUserInteractionEnabled = false
+        accessibilityElementsHidden = true
         setupTabItemViews(tabItems: tabItems)
         updateHighlightStates()
     }

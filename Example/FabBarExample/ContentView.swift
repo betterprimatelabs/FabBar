@@ -81,6 +81,7 @@ struct TabContentView: View {
                 Spacer()
             }
             .frame(maxWidth: .infinity)
+            .accessibilityHidden(true)
             .navigationTitle(title)
         }
     }

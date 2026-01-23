@@ -63,7 +63,8 @@ struct FabBarRepresentable<Tab: Hashable>: UIViewRepresentable {
     func updateUIView(_ uiView: GlassTabBarContainer<Tab>, context _: Context) {
         let control = uiView.segmentedControl
         let newIndex = items.firstIndex { $0.tab == activeTab } ?? 0
-        if control.selectedSegmentIndex != newIndex {
+        let selectionChanged = control.selectedSegmentIndex != newIndex
+        if selectionChanged {
             control.selectedSegmentIndex = newIndex
         }
 
@@ -75,6 +76,11 @@ struct FabBarRepresentable<Tab: Hashable>: UIViewRepresentable {
         // Reapply colors - UIKit can reset these after sheet presentations
         control.selectedSegmentTintColor = UIColor(barTint)
         uiView.labelsOverlay.inactiveTintColor = UIColor(inactiveTint)
+
+        // Keep VoiceOver focus on the tab bar after selection changes
+        if selectionChanged {
+            UIAccessibility.post(notification: .screenChanged, argument: control)
+        }
     }
 
     func sizeThatFits(_: ProposedViewSize, uiView _: GlassTabBarContainer<Tab>, context _: Context) -> CGSize? {

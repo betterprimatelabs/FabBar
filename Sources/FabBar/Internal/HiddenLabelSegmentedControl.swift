@@ -23,6 +23,18 @@ final class HiddenLabelSegmentedControl: UISegmentedControl {
     /// The segment index before touch began, used to restore on cancel and detect actual changes.
     private var originalIndex: Int?
 
+    override init(items: [Any]?) {
+        super.init(items: items)
+        // Note: .tabBar trait doesn't affect VoiceOver announcements on UISegmentedControl,
+        // but it's set here for semantic correctness since this control functions as a tab bar.
+        accessibilityTraits = .tabBar
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     /// Called when user taps the already-selected segment.
     var onReselect: ((Int) -> Void)?
 

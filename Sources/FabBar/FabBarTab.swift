@@ -1,4 +1,4 @@
-import Foundation
+import UIKit
 
 /// A tab configuration for FabBar.
 ///

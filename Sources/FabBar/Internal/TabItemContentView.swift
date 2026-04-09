@@ -14,25 +14,8 @@ final class TabItemContentView: UIView {
     private var customImageBundleIdentifier: String = ""
     private var title: String = ""
 
-    var showBadge: Bool = false {
-        didSet {
-            badgeDot.isHidden = !showBadge
-            setNeedsLayout()
-        }
-    }
-
     private let font = UIFont.systemFont(ofSize: Constants.tabTitleFontSize, weight: .semibold)
     private let imageAreaHeight = Constants.iconViewSize
-
-    private lazy var badgeDot: UIView = {
-        let size = Constants.badgeDotSize
-        let dot = UIView(frame: CGRect(x: 0, y: 0, width: size, height: size))
-        dot.backgroundColor = .systemOrange
-        dot.layer.cornerRadius = size / 2
-        dot.isHidden = true
-        dot.isUserInteractionEnabled = false
-        return dot
-    }()
 
     init(title: String, symbolName: String) {
         self.title = title
@@ -54,7 +37,6 @@ final class TabItemContentView: UIView {
         isUserInteractionEnabled = false
         contentMode = .redraw
         clipsToBounds = false
-        addSubview(badgeDot)
     }
 
     // MARK: - NSCoding
@@ -89,25 +71,6 @@ final class TabItemContentView: UIView {
         let contentWidth = max(icon?.size.width ?? 0, textSize.width)
         let height = imageAreaHeight + textSize.height
         return CGSize(width: contentWidth, height: height)
-    }
-
-    // MARK: - Layout
-
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        guard !badgeDot.isHidden else { return }
-        let icon = loadIcon()
-        let imageSize = icon?.size ?? .zero
-        let dotSize = Constants.badgeDotSize
-        let imageX = (bounds.width - imageSize.width) / 2
-        let contentNudgeUp: CGFloat = 1
-        let imageY = (imageAreaHeight - imageSize.height) / 2 - contentNudgeUp
-        badgeDot.frame = CGRect(
-            x: imageX + imageSize.width - dotSize / 2 + Constants.badgeOffsetX,
-            y: imageY - dotSize / 2 + Constants.badgeOffsetY,
-            width: dotSize,
-            height: dotSize
-        )
     }
 
     // MARK: - Drawing

@@ -104,8 +104,8 @@ struct FabBarRepresentable<Value: Hashable>: UIViewRepresentable {
         // letting the native segment labels render crisply at popover scale.
         // Two views per segment: base (inactive) underneath, accent (active) on top
         // masked to the glass indicator position.
-        let baseViews = tabs.map { makeContentView(for: $0, withBadge: true) }
-        let accentViews = tabs.map { makeContentView(for: $0, withBadge: false) }
+        let baseViews = tabs.map(makeContentView)
+        let accentViews = tabs.map(makeContentView)
         control.configureContentViews(baseViews, accentViews: accentViews)
 
         // Fixed width for <3 tabs (glass floats leading-aligned); 0 for 3+ (auto-distribute)
@@ -114,17 +114,12 @@ struct FabBarRepresentable<Value: Hashable>: UIViewRepresentable {
         }
     }
 
-    private func makeContentView(for tab: FabBarTab<Value>, withBadge: Bool = false) -> TabItemContentView {
-        let view: TabItemContentView
+    private func makeContentView(for tab: FabBarTab<Value>) -> TabItemContentView {
         if let imageName = tab.image {
-            view = TabItemContentView(title: tab.title, imageName: imageName, imageBundle: tab.imageBundle)
+            TabItemContentView(title: tab.title, imageName: imageName, imageBundle: tab.imageBundle)
         } else {
-            view = TabItemContentView(title: tab.title, symbolName: tab.systemImage ?? "")
+            TabItemContentView(title: tab.title, symbolName: tab.systemImage ?? "")
         }
-        if withBadge {
-            view.showBadge = tab.showBadge
-        }
-        return view
     }
 
     private func segmentTintColor(for traitCollection: UITraitCollection) -> UIColor {

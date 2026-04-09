@@ -29,6 +29,7 @@ final class TabBarSegmentedControl: UISegmentedControl {
     private static let injectedViewTag = 7_777
     /// Tag used to identify accent (active-colored) content views within segments.
     private static let accentViewTag = 7_778
+    private static let badgeDotTag = 7_779
 
     /// Stored tab content views to inject into segments (always inactive color).
     private var contentViews: [TabItemContentView] = []
@@ -109,13 +110,41 @@ final class TabBarSegmentedControl: UISegmentedControl {
     /// masked to the glass indicator position.
     /// Updates badge visibility on content views for each segment.
     func updateBadges(_ badges: [Bool]) {
+        let segmentViews = findSegmentViews()
         for (index, showBadge) in badges.enumerated() {
-            guard index < contentViews.count else { continue }
-            // Only show badge on base views — accent views have a tint mask
-            // that bleeds color onto the badge dot
-            if contentViews[index].showBadge != showBadge {
-                contentViews[index].showBadge = showBadge
-                contentViews[index].setNeedsDisplay()
+            guard index < segmentViews.count else { continue }
+            let segmentView = segmentViews[index]
+
+            if showBadge {
+                if segmentView.viewWithTag(Self.badgeDotTag) == nil {
+                    let dotSize = Constants.badgeDotSize
+                    let dot = UIView()
+                    dot.tag = Self.badgeDotTag
+                    dot.backgroundColor = .systemOrange
+                    dot.layer.cornerRadius = dotSize / 2
+                    dot.layer.zPosition = 999
+                    dot.isUserInteractionEnabled = false
+                    segmentView.addSubview(dot)
+                    segmentView.clipsToBounds = false
+
+                    // Position relative to the base content view's icon
+                    if let contentView = segmentView.viewWithTag(Self.injectedViewTag) {
+                        let iconConfig = UIImage.SymbolConfiguration(pointSize: Constants.tabIconPointSize, weight: .medium, scale: .large)
+                        let iconSize = UIImage(systemName: "person.2.fill", withConfiguration: iconConfig)?.size ?? CGSize(width: 24, height: 24)
+                        let imageAreaHeight = Constants.iconViewSize
+                        let contentNudgeUp: CGFloat = 1
+                        let iconX = (contentView.bounds.width - iconSize.width) / 2 + contentView.frame.origin.x
+                        let iconY = (imageAreaHeight - iconSize.height) / 2 - contentNudgeUp + contentView.frame.origin.y
+                        dot.frame = CGRect(
+                            x: iconX + iconSize.width - dotSize / 2 + Constants.badgeOffsetX,
+                            y: iconY - dotSize / 2 + Constants.badgeOffsetY,
+                            width: dotSize,
+                            height: dotSize
+                        )
+                    }
+                }
+            } else {
+                segmentView.viewWithTag(Self.badgeDotTag)?.removeFromSuperview()
             }
         }
     }

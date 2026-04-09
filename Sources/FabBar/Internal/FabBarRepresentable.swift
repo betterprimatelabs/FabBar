@@ -81,6 +81,9 @@ struct FabBarRepresentable<Value: Hashable>: UIViewRepresentable {
             control.selectedSegmentIndex = newIndex
         }
 
+        // Update badge visibility on content views
+        control.updateBadges(tabs.map(\.showBadge))
+
         // Set accent color from the view's inherited tintColor, converted to a concrete color.
         // Only update when tintAdjustmentMode is normal — when dimmed (e.g. sheet presented),
         // tintColor returns a dimmed gray which would incorrectly overwrite the accent color.
@@ -112,11 +115,14 @@ struct FabBarRepresentable<Value: Hashable>: UIViewRepresentable {
     }
 
     private func makeContentView(for tab: FabBarTab<Value>) -> TabItemContentView {
+        let view: TabItemContentView
         if let imageName = tab.image {
-            TabItemContentView(title: tab.title, imageName: imageName, imageBundle: tab.imageBundle)
+            view = TabItemContentView(title: tab.title, imageName: imageName, imageBundle: tab.imageBundle)
         } else {
-            TabItemContentView(title: tab.title, symbolName: tab.systemImage ?? "")
+            view = TabItemContentView(title: tab.title, symbolName: tab.systemImage ?? "")
         }
+        view.showBadge = tab.showBadge
+        return view
     }
 
     private func segmentTintColor(for traitCollection: UITraitCollection) -> UIColor {

@@ -107,6 +107,21 @@ final class TabBarSegmentedControl: UISegmentedControl {
     /// Configures the tab content views to be injected into each segment's view subtree.
     /// Base views are always inactive-colored; accent views are always active-colored and
     /// masked to the glass indicator position.
+    /// Updates badge visibility on content views for each segment.
+    func updateBadges(_ badges: [Bool]) {
+        for (index, showBadge) in badges.enumerated() {
+            guard index < contentViews.count, index < accentContentViews.count else { continue }
+            if contentViews[index].showBadge != showBadge {
+                contentViews[index].showBadge = showBadge
+                contentViews[index].setNeedsDisplay()
+            }
+            if accentContentViews[index].showBadge != showBadge {
+                accentContentViews[index].showBadge = showBadge
+                accentContentViews[index].setNeedsDisplay()
+            }
+        }
+    }
+
     func configureContentViews(_ baseViews: [TabItemContentView], accentViews: [TabItemContentView]) {
         cachedIndicatorView = nil
 

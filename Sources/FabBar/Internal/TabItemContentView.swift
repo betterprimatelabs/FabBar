@@ -13,6 +13,7 @@ final class TabItemContentView: UIView {
     private var customImageName: String = ""
     private var customImageBundleIdentifier: String = ""
     private var title: String = ""
+    var showBadge: Bool = false
 
     private let font = UIFont.systemFont(ofSize: Constants.tabTitleFontSize, weight: .semibold)
     private let imageAreaHeight = Constants.iconViewSize
@@ -102,6 +103,18 @@ final class TabItemContentView: UIView {
         let textX = (bounds.width - textSize.width) / 2
         let textPoint = CGPoint(x: textX, y: imageAreaHeight - contentNudgeUp + iconTextGap)
         (title as NSString).draw(at: textPoint, withAttributes: textAttributes)
+
+        // Draw badge dot if enabled
+        if showBadge, let icon {
+            let dotSize = Constants.badgeDotSize
+            let imageSize = icon.size
+            let imageX = (bounds.width - imageSize.width) / 2
+            let dotX = imageX + imageSize.width - Constants.badgeOffsetX
+            let dotY = (imageAreaHeight - imageSize.height) / 2 - contentNudgeUp - Constants.badgeOffsetY
+            let dotRect = CGRect(x: dotX, y: dotY, width: dotSize, height: dotSize)
+            UIColor.systemOrange.setFill()
+            UIBezierPath(ovalIn: dotRect).fill()
+        }
     }
 
     // MARK: - Private

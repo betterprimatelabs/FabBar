@@ -108,7 +108,8 @@ final class TabBarSegmentedControl: UISegmentedControl {
     /// Configures the tab content views to be injected into each segment's view subtree.
     /// Base views are always inactive-colored; accent views are always active-colored and
     /// masked to the glass indicator position.
-    /// Updates badge visibility on content views for each segment.
+    /// Updates badge dot visibility for each segment.
+    /// Badge dots are added directly to segment views above both base and accent layers.
     func updateBadges(_ badges: [(show: Bool, color: UIColor?)]) {
         let segmentViews = findSegmentViews()
         for (index, badge) in badges.enumerated() {
@@ -116,7 +117,10 @@ final class TabBarSegmentedControl: UISegmentedControl {
             let segmentView = segmentViews[index]
 
             if badge.show {
-                if segmentView.viewWithTag(Self.badgeDotTag) == nil {
+                if let existing = segmentView.viewWithTag(Self.badgeDotTag) {
+                    // Update color if changed
+                    existing.backgroundColor = badge.color ?? .tintColor
+                } else {
                     let dotSize = Constants.badgeDotSize
                     let dot = UIView()
                     dot.tag = Self.badgeDotTag
@@ -125,19 +129,14 @@ final class TabBarSegmentedControl: UISegmentedControl {
                     dot.layer.zPosition = 999
                     dot.isUserInteractionEnabled = false
                     segmentView.addSubview(dot)
-                    segmentView.clipsToBounds = false
 
-                    // Position relative to the base content view's icon
+                    // Position at top-trailing corner of the content view
                     if let contentView = segmentView.viewWithTag(Self.injectedViewTag) {
-                        let iconConfig = UIImage.SymbolConfiguration(pointSize: Constants.tabIconPointSize, weight: .medium, scale: .large)
-                        let iconSize = UIImage(systemName: "person.2.fill", withConfiguration: iconConfig)?.size ?? CGSize(width: 24, height: 24)
+                        let cvFrame = contentView.frame
                         let imageAreaHeight = Constants.iconViewSize
-                        let contentNudgeUp: CGFloat = 1
-                        let iconX = (contentView.bounds.width - iconSize.width) / 2 + contentView.frame.origin.x
-                        let iconY = (imageAreaHeight - iconSize.height) / 2 - contentNudgeUp + contentView.frame.origin.y
                         dot.frame = CGRect(
-                            x: iconX + iconSize.width - dotSize / 2 + Constants.badgeOffsetX,
-                            y: iconY - dotSize / 2 + Constants.badgeOffsetY,
+                            x: cvFrame.maxX - dotSize / 2 + Constants.badgeOffsetX,
+                            y: cvFrame.origin.y + (imageAreaHeight - dotSize) / 2 - dotSize + Constants.badgeOffsetY,
                             width: dotSize,
                             height: dotSize
                         )
@@ -149,6 +148,9 @@ final class TabBarSegmentedControl: UISegmentedControl {
         }
     }
 
+    /// Configures the tab content views to be injected into each segment's view subtree.
+    /// Base views are always inactive-colored; accent views are always active-colored and
+    /// masked to the glass indicator position.
     func configureContentViews(_ baseViews: [TabItemContentView], accentViews: [TabItemContentView]) {
         cachedIndicatorView = nil
 

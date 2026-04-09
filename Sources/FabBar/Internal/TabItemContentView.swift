@@ -47,6 +47,8 @@ final class TabItemContentView: UIView {
         self.customImageBundleIdentifier = coder.decodeObject(forKey: "customImageBundleIdentifier") as? String ?? ""
         self.title = coder.decodeObject(forKey: "title") as? String ?? ""
         super.init(coder: coder)
+        // When unarchived by the accessibility popover, hide this view so only the
+        // native segment labels are visible. The system renders those at popover scale.
         isHidden = true
     }
 

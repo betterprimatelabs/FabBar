@@ -13,19 +13,32 @@ final class TabItemContentView: UIView {
     private var customImageName: String = ""
     private var customImageBundleIdentifier: String = ""
     private var title: String = ""
-    var showBadge: Bool = false
+
+    var showBadge: Bool = false {
+        didSet {
+            badgeDot.isHidden = !showBadge
+            setNeedsLayout()
+        }
+    }
 
     private let font = UIFont.systemFont(ofSize: Constants.tabTitleFontSize, weight: .semibold)
     private let imageAreaHeight = Constants.iconViewSize
+
+    private lazy var badgeDot: UIView = {
+        let size = Constants.badgeDotSize
+        let dot = UIView(frame: CGRect(x: 0, y: 0, width: size, height: size))
+        dot.backgroundColor = .systemOrange
+        dot.layer.cornerRadius = size / 2
+        dot.isHidden = true
+        dot.isUserInteractionEnabled = false
+        return dot
+    }()
 
     init(title: String, symbolName: String) {
         self.title = title
         self.symbolName = symbolName
         super.init(frame: .zero)
-        isOpaque = false
-        isUserInteractionEnabled = false
-        contentMode = .redraw
-        clipsToBounds = false
+        commonInit()
     }
 
     init(title: String, imageName: String, imageBundle: Bundle?) {
@@ -33,10 +46,15 @@ final class TabItemContentView: UIView {
         self.customImageName = imageName
         self.customImageBundleIdentifier = imageBundle?.bundleIdentifier ?? ""
         super.init(frame: .zero)
+        commonInit()
+    }
+
+    private func commonInit() {
         isOpaque = false
         isUserInteractionEnabled = false
         contentMode = .redraw
         clipsToBounds = false
+        addSubview(badgeDot)
     }
 
     // MARK: - NSCoding
@@ -47,8 +65,6 @@ final class TabItemContentView: UIView {
         self.customImageBundleIdentifier = coder.decodeObject(forKey: "customImageBundleIdentifier") as? String ?? ""
         self.title = coder.decodeObject(forKey: "title") as? String ?? ""
         super.init(coder: coder)
-        // When unarchived by the accessibility popover, hide this view so only the
-        // native segment labels are visible. The system renders those at popover scale.
         isHidden = true
     }
 
@@ -70,11 +86,28 @@ final class TabItemContentView: UIView {
     override var intrinsicContentSize: CGSize {
         let textSize = (title as NSString).size(withAttributes: [.font: font])
         let icon = loadIcon()
-        let iconWidth = icon?.size.width ?? 0
-        let badgePadding: CGFloat = showBadge ? Constants.badgeDotSize : 0
-        let contentWidth = max(iconWidth + badgePadding, textSize.width)
+        let contentWidth = max(icon?.size.width ?? 0, textSize.width)
         let height = imageAreaHeight + textSize.height
         return CGSize(width: contentWidth, height: height)
+    }
+
+    // MARK: - Layout
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        guard !badgeDot.isHidden else { return }
+        let icon = loadIcon()
+        let imageSize = icon?.size ?? .zero
+        let dotSize = Constants.badgeDotSize
+        let imageX = (bounds.width - imageSize.width) / 2
+        let contentNudgeUp: CGFloat = 1
+        let imageY = (imageAreaHeight - imageSize.height) / 2 - contentNudgeUp
+        badgeDot.frame = CGRect(
+            x: imageX + imageSize.width - dotSize / 2 + Constants.badgeOffsetX,
+            y: imageY - dotSize / 2 + Constants.badgeOffsetY,
+            width: dotSize,
+            height: dotSize
+        )
     }
 
     // MARK: - Drawing
@@ -107,18 +140,6 @@ final class TabItemContentView: UIView {
         let textX = (bounds.width - textSize.width) / 2
         let textPoint = CGPoint(x: textX, y: imageAreaHeight - contentNudgeUp + iconTextGap)
         (title as NSString).draw(at: textPoint, withAttributes: textAttributes)
-
-        // Draw badge dot if enabled
-        if showBadge, let icon {
-            let dotSize = Constants.badgeDotSize
-            let imageSize = icon.size
-            let imageX = (bounds.width - imageSize.width) / 2
-            let dotX = imageX + imageSize.width - Constants.badgeOffsetX
-            let dotY = (imageAreaHeight - imageSize.height) / 2 - contentNudgeUp - Constants.badgeOffsetY
-            let dotRect = CGRect(x: dotX, y: dotY, width: dotSize, height: dotSize)
-            UIColor.systemOrange.setFill()
-            UIBezierPath(ovalIn: dotRect).fill()
-        }
     }
 
     // MARK: - Private

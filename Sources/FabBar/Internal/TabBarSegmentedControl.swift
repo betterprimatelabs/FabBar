@@ -86,6 +86,7 @@ final class TabBarSegmentedControl: UISegmentedControl {
         hideDefaultLabels()
         injectContentViewsIfNeeded()
         updateContentViewColors()
+        layoutBadgeDots()
     }
 
     override func didMoveToWindow() {
@@ -110,6 +111,7 @@ final class TabBarSegmentedControl: UISegmentedControl {
     /// masked to the glass indicator position.
     /// Updates badge dot visibility for each segment.
     /// Badge dots are added directly to segment views above both base and accent layers.
+    /// Positioning is handled separately in `layoutBadgeDots()` which runs on every layout pass.
     func updateBadges(_ badges: [(show: Bool, color: UIColor?)]) {
         let segmentViews = findSegmentViews()
         for (index, badge) in badges.enumerated() {
@@ -118,7 +120,6 @@ final class TabBarSegmentedControl: UISegmentedControl {
 
             if badge.show {
                 if let existing = segmentView.viewWithTag(Self.badgeDotTag) {
-                    // Update color if changed
                     existing.backgroundColor = badge.color ?? .tintColor
                 } else {
                     let dotSize = Constants.badgeDotSize
@@ -129,22 +130,28 @@ final class TabBarSegmentedControl: UISegmentedControl {
                     dot.layer.zPosition = 999
                     dot.isUserInteractionEnabled = false
                     segmentView.addSubview(dot)
-
-                    // Position at top-trailing corner of the content view
-                    if let contentView = segmentView.viewWithTag(Self.injectedViewTag) {
-                        let cvFrame = contentView.frame
-                        let imageAreaHeight = Constants.iconViewSize
-                        dot.frame = CGRect(
-                            x: cvFrame.maxX - dotSize / 2 + Constants.badgeOffsetX,
-                            y: cvFrame.origin.y + (imageAreaHeight - dotSize) / 2 - dotSize + Constants.badgeOffsetY,
-                            width: dotSize,
-                            height: dotSize
-                        )
-                    }
                 }
             } else {
                 segmentView.viewWithTag(Self.badgeDotTag)?.removeFromSuperview()
             }
+        }
+        setNeedsLayout()
+    }
+
+    /// Repositions badge dots relative to their content views.
+    /// Called from `layoutSubviews` so badges stay correct across rotations and resizes.
+    private func layoutBadgeDots() {
+        let dotSize = Constants.badgeDotSize
+        for segmentView in findSegmentViews() {
+            guard let dot = segmentView.viewWithTag(Self.badgeDotTag),
+                  let contentView = segmentView.viewWithTag(Self.injectedViewTag) else { continue }
+            let cvFrame = contentView.frame
+            dot.frame = CGRect(
+                x: cvFrame.maxX - dotSize / 2 + Constants.badgeOffsetX,
+                y: cvFrame.minY + Constants.badgeOffsetY,
+                width: dotSize,
+                height: dotSize
+            )
         }
     }
 

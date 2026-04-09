@@ -60,16 +60,6 @@ enum Constants {
     /// Offset from the top-trailing corner of the icon area.
     static let badgeOffsetX: CGFloat = 2
     static let badgeOffsetY: CGFloat = 2
-
-    // MARK: - Badge
-
-    /// Diameter of the badge indicator dot.
-    static let badgeDotSize: CGFloat = 8
-
-    /// Offset from the top-trailing corner of the icon area.
-    static let badgeOffsetX: CGFloat = 2
-    static let badgeOffsetY: CGFloat = 2
-
 }
 
 /// Logger for FabBar warnings and diagnostics.

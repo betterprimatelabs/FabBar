@@ -30,15 +30,13 @@ public struct FabBarTab<Value: Hashable>: Identifiable {
     /// Whether to show a badge indicator dot on this tab.
     public let showBadge: Bool
 
-    /// Whether to show a badge dot on this tab.
-    public let showBadge: Bool
-
     /// Creates a tab with an SF Symbol icon.
     ///
     /// - Parameters:
     ///   - value: The tab identifier.
     ///   - title: The title displayed below the icon.
     ///   - systemImage: The SF Symbol name for the icon.
+    ///   - showBadge: Whether to show a badge indicator dot.
     ///   - onReselect: Called when the user taps this tab while it's already selected.
     public init(
         value: Value,
@@ -63,6 +61,7 @@ public struct FabBarTab<Value: Hashable>: Identifiable {
     ///   - title: The title displayed below the icon.
     ///   - image: The custom image name.
     ///   - imageBundle: The bundle containing the image. Defaults to `.main`.
+    ///   - showBadge: Whether to show a badge indicator dot.
     ///   - onReselect: Called when the user taps this tab while it's already selected.
     public init(
         value: Value,

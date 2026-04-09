@@ -110,14 +110,12 @@ final class TabBarSegmentedControl: UISegmentedControl {
     /// Updates badge visibility on content views for each segment.
     func updateBadges(_ badges: [Bool]) {
         for (index, showBadge) in badges.enumerated() {
-            guard index < contentViews.count, index < accentContentViews.count else { continue }
+            guard index < contentViews.count else { continue }
+            // Only show badge on base views — accent views have a tint mask
+            // that bleeds color onto the badge dot
             if contentViews[index].showBadge != showBadge {
                 contentViews[index].showBadge = showBadge
                 contentViews[index].setNeedsDisplay()
-            }
-            if accentContentViews[index].showBadge != showBadge {
-                accentContentViews[index].showBadge = showBadge
-                accentContentViews[index].setNeedsDisplay()
             }
         }
     }

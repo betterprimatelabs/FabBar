@@ -144,6 +144,8 @@ final class TabBarSegmentedControl: UISegmentedControl {
               segmentViews.count == accentContentViews.count else { return }
 
         for (index, segmentView) in segmentViews.enumerated() {
+            segmentView.clipsToBounds = false
+
             // Base (inactive) content view
             if segmentView.viewWithTag(Self.injectedViewTag) == nil {
                 let contentView = contentViews[index]

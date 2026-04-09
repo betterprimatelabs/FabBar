@@ -25,6 +25,7 @@ final class TabItemContentView: UIView {
         isOpaque = false
         isUserInteractionEnabled = false
         contentMode = .redraw
+        clipsToBounds = false
     }
 
     init(title: String, imageName: String, imageBundle: Bundle?) {
@@ -35,6 +36,7 @@ final class TabItemContentView: UIView {
         isOpaque = false
         isUserInteractionEnabled = false
         contentMode = .redraw
+        clipsToBounds = false
     }
 
     // MARK: - NSCoding
@@ -68,7 +70,9 @@ final class TabItemContentView: UIView {
     override var intrinsicContentSize: CGSize {
         let textSize = (title as NSString).size(withAttributes: [.font: font])
         let icon = loadIcon()
-        let contentWidth = max(icon?.size.width ?? 0, textSize.width)
+        let iconWidth = icon?.size.width ?? 0
+        let badgePadding: CGFloat = showBadge ? Constants.badgeDotSize : 0
+        let contentWidth = max(iconWidth + badgePadding, textSize.width)
         let height = imageAreaHeight + textSize.height
         return CGSize(width: contentWidth, height: height)
     }

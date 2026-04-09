@@ -30,6 +30,9 @@ public struct FabBarTab<Value: Hashable>: Identifiable {
     /// Whether to show a badge indicator dot on this tab.
     public let showBadge: Bool
 
+    /// The color of the badge dot. Defaults to the view's tint color.
+    public let badgeColor: UIColor?
+
     /// Creates a tab with an SF Symbol icon.
     ///
     /// - Parameters:
@@ -43,6 +46,7 @@ public struct FabBarTab<Value: Hashable>: Identifiable {
         title: String,
         systemImage: String,
         showBadge: Bool = false,
+        badgeColor: UIColor? = nil,
         onReselect: (() -> Void)? = nil
     ) {
         self.value = value
@@ -52,6 +56,7 @@ public struct FabBarTab<Value: Hashable>: Identifiable {
         self.imageBundle = nil
         self.onReselect = onReselect
         self.showBadge = showBadge
+        self.badgeColor = badgeColor
     }
 
     /// Creates a tab with a custom image from a bundle.
@@ -69,6 +74,7 @@ public struct FabBarTab<Value: Hashable>: Identifiable {
         image: String,
         imageBundle: Bundle? = nil,
         showBadge: Bool = false,
+        badgeColor: UIColor? = nil,
         onReselect: (() -> Void)? = nil
     ) {
         self.value = value
@@ -78,5 +84,6 @@ public struct FabBarTab<Value: Hashable>: Identifiable {
         self.imageBundle = imageBundle ?? .main
         self.onReselect = onReselect
         self.showBadge = showBadge
+        self.badgeColor = badgeColor
     }
 }

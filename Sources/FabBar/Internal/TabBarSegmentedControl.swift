@@ -109,18 +109,18 @@ final class TabBarSegmentedControl: UISegmentedControl {
     /// Base views are always inactive-colored; accent views are always active-colored and
     /// masked to the glass indicator position.
     /// Updates badge visibility on content views for each segment.
-    func updateBadges(_ badges: [Bool]) {
+    func updateBadges(_ badges: [(show: Bool, color: UIColor?)]) {
         let segmentViews = findSegmentViews()
-        for (index, showBadge) in badges.enumerated() {
+        for (index, badge) in badges.enumerated() {
             guard index < segmentViews.count else { continue }
             let segmentView = segmentViews[index]
 
-            if showBadge {
+            if badge.show {
                 if segmentView.viewWithTag(Self.badgeDotTag) == nil {
                     let dotSize = Constants.badgeDotSize
                     let dot = UIView()
                     dot.tag = Self.badgeDotTag
-                    dot.backgroundColor = .systemOrange
+                    dot.backgroundColor = badge.color ?? .tintColor
                     dot.layer.cornerRadius = dotSize / 2
                     dot.layer.zPosition = 999
                     dot.isUserInteractionEnabled = false

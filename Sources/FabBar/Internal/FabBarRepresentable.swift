@@ -82,7 +82,7 @@ struct FabBarRepresentable<Value: Hashable>: UIViewRepresentable {
         }
 
         // Update badge visibility on content views
-        control.updateBadges(tabs.map(\.showBadge))
+        control.updateBadges(tabs.map { (show: $0.showBadge, color: $0.badgeColor) })
 
         // Set accent color from the view's inherited tintColor, converted to a concrete color.
         // Only update when tintAdjustmentMode is normal — when dimmed (e.g. sheet presented),

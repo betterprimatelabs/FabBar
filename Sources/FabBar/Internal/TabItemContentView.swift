@@ -14,20 +14,25 @@ final class TabItemContentView: UIView {
     private var customImageBundleIdentifier: String = ""
     private var title: String = ""
 
-    private let font = UIFont.systemFont(ofSize: Constants.tabTitleFontSize, weight: .semibold)
+    private var font = UIFont.systemFont(ofSize: Constants.tabTitleFontSize, weight: .semibold)
+    private var titleKerning: CGFloat = 0
     private let imageAreaHeight = Constants.iconViewSize
 
-    init(title: String, symbolName: String) {
+    init(title: String, symbolName: String, font: UIFont, titleKerning: CGFloat) {
         self.title = title
         self.symbolName = symbolName
+        self.font = font
+        self.titleKerning = titleKerning
         super.init(frame: .zero)
         commonInit()
     }
 
-    init(title: String, imageName: String, imageBundle: Bundle?) {
+    init(title: String, imageName: String, imageBundle: Bundle?, font: UIFont, titleKerning: CGFloat) {
         self.title = title
         self.customImageName = imageName
         self.customImageBundleIdentifier = imageBundle?.bundleIdentifier ?? ""
+        self.font = font
+        self.titleKerning = titleKerning
         super.init(frame: .zero)
         commonInit()
     }
@@ -46,6 +51,8 @@ final class TabItemContentView: UIView {
         self.customImageName = coder.decodeObject(forKey: "customImageName") as? String ?? ""
         self.customImageBundleIdentifier = coder.decodeObject(forKey: "customImageBundleIdentifier") as? String ?? ""
         self.title = coder.decodeObject(forKey: "title") as? String ?? ""
+        self.font = coder.decodeObject(forKey: "font") as? UIFont ?? UIFont.systemFont(ofSize: Constants.tabTitleFontSize, weight: .semibold)
+        self.titleKerning = coder.decodeDouble(forKey: "titleKerning")
         super.init(coder: coder)
         // When unarchived by the accessibility popover, hide this view so only the
         // native segment labels are visible. The system renders those at popover scale.
@@ -58,6 +65,8 @@ final class TabItemContentView: UIView {
         coder.encode(customImageName, forKey: "customImageName")
         coder.encode(customImageBundleIdentifier, forKey: "customImageBundleIdentifier")
         coder.encode(title, forKey: "title")
+        coder.encode(font, forKey: "font")
+        coder.encode(titleKerning, forKey: "titleKerning")
     }
 
     override func tintColorDidChange() {
@@ -68,7 +77,7 @@ final class TabItemContentView: UIView {
     // MARK: - Sizing
 
     override var intrinsicContentSize: CGSize {
-        let textSize = (title as NSString).size(withAttributes: [.font: font])
+        let textSize = (title as NSString).size(withAttributes: textAttributes(with: tintColor))
         let icon = loadIcon()
         let contentWidth = max(icon?.size.width ?? 0, textSize.width)
         let height = imageAreaHeight + textSize.height
@@ -81,10 +90,7 @@ final class TabItemContentView: UIView {
         let tintColor = tintColor ?? .label
 
         let icon = loadIcon()
-        let textAttributes: [NSAttributedString.Key: Any] = [
-            .font: font,
-            .foregroundColor: tintColor,
-        ]
+        let textAttributes = textAttributes(with: tintColor)
         let textSize = (title as NSString).size(withAttributes: textAttributes)
 
         let contentNudgeUp: CGFloat = 1
@@ -108,6 +114,14 @@ final class TabItemContentView: UIView {
     }
 
     // MARK: - Private
+
+    private func textAttributes(with color: UIColor) -> [NSAttributedString.Key: Any] {
+        [
+            .font: font,
+            .foregroundColor: color,
+            .kern: titleKerning,
+        ]
+    }
 
     private func loadIcon() -> UIImage? {
         let config = UIImage.SymbolConfiguration(

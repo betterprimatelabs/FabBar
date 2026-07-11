@@ -23,6 +23,15 @@ public struct FabBarTab<Value: Hashable>: Identifiable {
     /// The bundle containing the custom image. Defaults to `.main` if not specified.
     public let imageBundle: Bundle?
 
+    /// The font used by inactive tab titles. Defaults to the package's existing system font.
+    public let titleFont: UIFont?
+
+    /// The font used by the selected tab title. Defaults to the package's existing system font.
+    public let selectedTitleFont: UIFont?
+
+    /// Tracking applied to all tab titles. Defaults to `0`.
+    public let titleKerning: CGFloat
+
     /// Called when the user taps this tab while it's already selected.
     /// Useful for scroll-to-top or similar behaviors.
     public let onReselect: (() -> Void)?
@@ -45,6 +54,9 @@ public struct FabBarTab<Value: Hashable>: Identifiable {
         value: Value,
         title: String,
         systemImage: String,
+        titleFont: UIFont? = nil,
+        selectedTitleFont: UIFont? = nil,
+        titleKerning: CGFloat = 0,
         showBadge: Bool = false,
         badgeColor: UIColor? = nil,
         onReselect: (() -> Void)? = nil
@@ -54,6 +66,9 @@ public struct FabBarTab<Value: Hashable>: Identifiable {
         self.systemImage = systemImage
         self.image = nil
         self.imageBundle = nil
+        self.titleFont = titleFont
+        self.selectedTitleFont = selectedTitleFont
+        self.titleKerning = titleKerning
         self.onReselect = onReselect
         self.showBadge = showBadge
         self.badgeColor = badgeColor
@@ -73,6 +88,9 @@ public struct FabBarTab<Value: Hashable>: Identifiable {
         title: String,
         image: String,
         imageBundle: Bundle? = nil,
+        titleFont: UIFont? = nil,
+        selectedTitleFont: UIFont? = nil,
+        titleKerning: CGFloat = 0,
         showBadge: Bool = false,
         badgeColor: UIColor? = nil,
         onReselect: (() -> Void)? = nil
@@ -82,6 +100,9 @@ public struct FabBarTab<Value: Hashable>: Identifiable {
         self.systemImage = nil
         self.image = image
         self.imageBundle = imageBundle ?? .main
+        self.titleFont = titleFont
+        self.selectedTitleFont = selectedTitleFont
+        self.titleKerning = titleKerning
         self.onReselect = onReselect
         self.showBadge = showBadge
         self.badgeColor = badgeColor

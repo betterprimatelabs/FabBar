@@ -104,8 +104,18 @@ struct FabBarRepresentable<Value: Hashable>: UIViewRepresentable {
         // letting the native segment labels render crisply at popover scale.
         // Two views per segment: base (inactive) underneath, accent (active) on top
         // masked to the glass indicator position.
-        let baseViews = tabs.map(makeContentView)
-        let accentViews = tabs.map(makeContentView)
+        let baseViews = tabs.map { tab in
+            makeContentView(
+                for: tab,
+                font: tab.titleFont ?? UIFont.systemFont(ofSize: Constants.tabTitleFontSize, weight: .semibold)
+            )
+        }
+        let accentViews = tabs.map { tab in
+            makeContentView(
+                for: tab,
+                font: tab.selectedTitleFont ?? UIFont.systemFont(ofSize: Constants.tabTitleFontSize, weight: .semibold)
+            )
+        }
         control.configureContentViews(baseViews, accentViews: accentViews)
 
         // Fixed width for <3 tabs (glass floats leading-aligned); 0 for 3+ (auto-distribute)
@@ -114,11 +124,11 @@ struct FabBarRepresentable<Value: Hashable>: UIViewRepresentable {
         }
     }
 
-    private func makeContentView(for tab: FabBarTab<Value>) -> TabItemContentView {
+    private func makeContentView(for tab: FabBarTab<Value>, font: UIFont) -> TabItemContentView {
         if let imageName = tab.image {
-            TabItemContentView(title: tab.title, imageName: imageName, imageBundle: tab.imageBundle)
+            TabItemContentView(title: tab.title, imageName: imageName, imageBundle: tab.imageBundle, font: font, titleKerning: tab.titleKerning)
         } else {
-            TabItemContentView(title: tab.title, symbolName: tab.systemImage ?? "")
+            TabItemContentView(title: tab.title, symbolName: tab.systemImage ?? "", font: font, titleKerning: tab.titleKerning)
         }
     }
 
